@@ -32,11 +32,13 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => {
+      .catch(async () => {
         if (request.mode === "navigate") {
-          return caches.match("/") || new Response("Offline", { status: 503 });
+          const cached = await caches.match("/");
+          return cached || new Response("Offline", { status: 503 });
         }
-        return caches.match(request);
+        const cached = await caches.match(request);
+        return cached || new Response("", { status: 504 });
       })
   );
 });
